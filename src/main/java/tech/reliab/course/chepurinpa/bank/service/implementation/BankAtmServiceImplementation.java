@@ -29,12 +29,13 @@ public class BankAtmServiceImplementation implements BankAtmService {
                 .servicingEmployee(servicingEmployee)
                 .canDispenseCash(canDispenseCash)
                 .canAcceptCash(canAcceptCash)
+                .atmFunds(atmFunds)
                 .maintenanceCost(maintenanceCost)
                 .build();
         bank.setAtmCount(bank.getAtmCount() + 1);
         bankOffice.setAtmCount(bankOffice.getAtmCount() + 1);
         if (bank.getTotalFunds() < atmFunds) {
-            throw new IllegalArgumentException("Insufficient funds in the bank for the ATM");
+            throw new IllegalArgumentException("В банке недостаточно средств для банкомата");
         } else {
             bankAtm.setAtmFunds(atmFunds);
         }

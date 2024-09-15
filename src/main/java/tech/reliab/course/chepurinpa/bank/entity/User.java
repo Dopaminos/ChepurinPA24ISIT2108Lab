@@ -6,6 +6,7 @@ import lombok.Setter;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.List;
 
 @Getter
@@ -19,8 +20,10 @@ public class User {
     private String workplace;
     private Double monthlyIncome;
     private List<Bank> associatedBanks;
-    private List<CreditAccount> creditAccounts;
-    private List<PaymentAccount> paymentAccounts;
+    @Builder.Default
+    private List<CreditAccount> creditAccounts = new ArrayList<>();
+    @Builder.Default
+    private List<PaymentAccount> paymentAccounts = new ArrayList<>();
     private Integer creditRating;
 
     @Override

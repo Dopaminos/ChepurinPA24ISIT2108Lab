@@ -7,7 +7,4 @@ public class AtmNotFoundException extends Exception {
         super(DEFAULT_MESSAGE);
     }
 
-    public AtmNotFoundException(String message) {
-        super(message);
-    }
 }

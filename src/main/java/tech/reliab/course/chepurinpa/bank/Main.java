@@ -62,9 +62,7 @@ public class Main {
         }
     }
 
-    private static void processCreditRequest(EntitiesInitializer initializer,
-                                             User user,
-                                             double requestedAmount) throws Exception {
+    private static void processCreditRequest(EntitiesInitializer initializer, User user, double requestedAmount) throws Exception {
         System.out.println("Поиск лучшего банка...");
         Optional<Bank> bankOpt = initializer.findBestBank();
         if (bankOpt.isEmpty()) {
@@ -76,14 +74,6 @@ public class Main {
         System.out.println("Поиск подходящего офиса...");
         Optional<BankOffice> officeOpt = initializer.findSuitableOffice(bank, requestedAmount);
         if (officeOpt.isEmpty()) {
-            System.out.println("Ошибка: Не найден подходящий офис.");
-            System.out.println("Доступные офисы:");
-            bank.getOffices().forEach(office -> {
-                System.out.println("Офис: " + office.getOfficeName());
-                System.out.println("Офис работает: " + office.getIsOperational());
-                System.out.println("Офис может выдавать кредиты: " + office.getCanIssueLoans());
-                System.out.println("Средства офиса: " + office.getOfficeFunds());
-            });
             throw new OfficeNotFoundException();
         }
         BankOffice office = officeOpt.get();
@@ -103,9 +93,7 @@ public class Main {
 
         if (user.getPaymentAccounts().stream().noneMatch(account -> account.getBank().equals(bank))) {
             System.out.println("Создание нового платёжного счёта...");
-            PaymentAccount newAccount = initializer.generatePaymentAccount(user,
-                    bank,
-                    user.getPaymentAccounts().size() + 1);
+            PaymentAccount newAccount = initializer.generatePaymentAccount(user, bank, user.getPaymentAccounts().size() + 1);
             user.getPaymentAccounts().add(newAccount);
             initializer.paymentAccountList.add(newAccount);
             System.out.println("Создан новый платёжный счёт: " + newAccount.getPaymentAccountId());
@@ -120,10 +108,7 @@ public class Main {
         System.out.println("Найден банкомат: " + atm.getAtmId());
 
         System.out.println("Создание кредитного счёта...");
-        CreditAccount creditAccount = initializer.generateCreditAccount(user,
-                employee, user.getPaymentAccounts().getFirst(),
-                bank,
-                user.getCreditAccounts().size() + 1);
+        CreditAccount creditAccount = initializer.generateCreditAccount(user, employee, user.getPaymentAccounts().getFirst(), bank, user.getCreditAccounts().size() + 1);
         user.getCreditAccounts().add(creditAccount);
         initializer.creditAccountList.add(creditAccount);
         System.out.println("Кредит успешно выдан.");

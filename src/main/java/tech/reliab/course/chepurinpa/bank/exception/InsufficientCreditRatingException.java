@@ -7,7 +7,4 @@ public class InsufficientCreditRatingException extends Exception {
         super(DEFAULT_MESSAGE);
     }
 
-    public InsufficientCreditRatingException(String message) {
-        super(message);
-    }
 }

@@ -10,5 +10,5 @@ public interface BankService {
 
     void updateBankById(Long bankId, Bank bank);
 
-    void deleteBankById(Long bankId, Bank bank);
+    void deleteBankById(Long bankId);
 }

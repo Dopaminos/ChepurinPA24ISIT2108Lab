@@ -1,17 +1,15 @@
 package tech.reliab.course.chepurinpa.bank.service;
 
-import tech.reliab.course.chepurinpa.bank.entity.Bank;
 import tech.reliab.course.chepurinpa.bank.entity.PaymentAccount;
 import tech.reliab.course.chepurinpa.bank.entity.User;
 
 public interface PaymentAccountService {
 
-    PaymentAccount createPaymentAccount(Long id, User user, Bank bank);
+    PaymentAccount createPaymentAccount(Long paymentAccountId, User accountHolder, String bankName, Double balance);
 
-    PaymentAccount getPaymentAccountById(Long id);
+    PaymentAccount getPaymentAccountById(Long paymentAccountId);
 
+    void updatePaymentAccountById(Long paymentAccountId, PaymentAccount paymentAccount);
 
-    void updatePaymentAccountById(Long id);
-
-    void deletePaymentAccountById(Long id);
+    void deletePaymentAccountById(Long paymentAccountId);
 }

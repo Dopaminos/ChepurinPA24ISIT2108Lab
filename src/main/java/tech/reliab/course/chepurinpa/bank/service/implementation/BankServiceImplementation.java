@@ -3,37 +3,43 @@ package tech.reliab.course.chepurinpa.bank.service.implementation;
 import tech.reliab.course.chepurinpa.bank.entity.Bank;
 import tech.reliab.course.chepurinpa.bank.service.BankService;
 
-import java.util.Random;
+import java.util.HashMap;
+import java.util.Map;
 
 public class BankServiceImplementation implements BankService {
 
+    private final Map<Long, Bank> bankMap = new HashMap<>();
+
     @Override
     public Bank createBank(Long bankId, String bankName) {
-        Random random = new Random();
         Bank bank = Bank.builder()
                 .bankId(bankId)
                 .bankName(bankName)
-                .officeCount(0)
-                .atmCount(0)
-                .employeeCount(0)
-                .customerCount(0)
-                .bankRating(random.nextInt(101))
-                .totalFunds(Math.round(random.nextDouble(1_000_000) * 100.0) / 100.0)
                 .build();
-        bank.setInterestRate(Math.round((20 - bank.getBankRating() * 0.2) * 100.0) / 100.0);
+        bankMap.put(bankId, bank);
         return bank;
     }
 
     @Override
     public Bank getBankById(Long bankId) {
-        return null;
+        return bankMap.get(bankId);
     }
 
     @Override
     public void updateBankById(Long bankId, Bank bank) {
+        if (bankMap.containsKey(bankId)) {
+            bankMap.put(bankId, bank);
+        } else {
+            throw new IllegalArgumentException("Банк с ID " + bankId + " не существует.");
+        }
     }
 
     @Override
-    public void deleteBankById(Long bankId, Bank bank) {
+    public void deleteBankById(Long bankId) {
+        if (bankMap.containsKey(bankId)) {
+            bankMap.remove(bankId);
+        } else {
+            throw new IllegalArgumentException("Банк с ID " + bankId + " не существует.");
+        }
     }
 }

@@ -20,6 +20,7 @@ public class BankOffice {
     private Boolean canAcceptCash;
     private Double officeFunds;
     private Double rentalCost;
+    private Bank bank;
 
     @Override
     public String toString() {

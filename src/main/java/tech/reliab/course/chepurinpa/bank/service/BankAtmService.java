@@ -22,5 +22,5 @@ public interface BankAtmService {
 
     void updateBankAtmById(Long atmId, BankAtm bankAtm);
 
-    void deleteBankAtmById(Long atmId, BankAtm bankAtm);
+    void deleteBankAtmById(Long atmId);
 }

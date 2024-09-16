@@ -8,21 +8,19 @@ import java.time.LocalDate;
 
 public interface EmployeeService {
 
-    Employee createEmployee(Long id,
+    Employee createEmployee(Long employeeId,
                             String fullName,
-                            LocalDate dateOfBirth,
-                            String position,
+                            LocalDate birthDate,
+                            String jobTitle,
                             Bank bank,
                             Boolean isRemote,
                             BankOffice bankOffice,
-                            Boolean canIssueCredit,
+                            Boolean canIssueLoans,
                             Double salary);
 
+    Employee getEmployeeById(Long employeeId);
 
-    Employee getEmployeeById(Long id);
+    void updateEmployeeById(Long employeeId, Employee employee);
 
-    void updateEmployeeById(Long id);
-
-    void deleteEmployeeById(Long id);
-
+    void deleteEmployeeById(Long employeeId);
 }

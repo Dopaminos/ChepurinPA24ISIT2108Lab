@@ -29,6 +29,7 @@ public class Bank {
     private List<Employee> employees = new ArrayList<>();
     @Builder.Default
     private List<User> users = new ArrayList<>();
+
     @Override
     public String toString() {
         return "Bank {" +

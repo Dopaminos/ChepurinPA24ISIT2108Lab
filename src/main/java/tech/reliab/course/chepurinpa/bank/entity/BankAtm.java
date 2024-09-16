@@ -30,7 +30,7 @@ public class BankAtm {
                 ", \natmStatus='" + atmStatus + '\'' +
                 ", \nbankId=" + bank.getBankId() +
                 ", \nbankOfficeId=" + bankOffice.getOfficeId() +
-                ", \nservicingEmployeeId=" + servicingEmployee.getEmployeeId() +
+                ", \nservicingEmployeeId=" + (servicingEmployee != null ? servicingEmployee.getEmployeeId() : "null") +
                 ", \ncanDispenseCash=" + canDispenseCash +
                 ", \ncanAcceptCash=" + canAcceptCash +
                 ", \natmFunds=" + atmFunds +

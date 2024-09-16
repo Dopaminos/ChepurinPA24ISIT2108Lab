@@ -10,7 +10,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
-
 public class EntitiesInitializer {
 
     private final BankService bankService = new BankServiceImplementation();
@@ -30,16 +29,15 @@ public class EntitiesInitializer {
     public final List<CreditAccount> creditAccountList = new ArrayList<>();
 
     private final Random random = new Random();
-    private final String[] firstNames = {"Иван", "Петр", "Сергей", "Алексей", "Дмитрий"};
-    private final String[] lastNames = {"Иванов", "Петров", "Сидоров", "Смирнов", "Кузнецов"};
-    private final String[] middleNames = {"Иванович", "Петрович", "Сергеевич", "Алексеевич", "Дмитриевич"};
-    private final String[] jobTitles = {"Менеджер", "Консультант", "Кассир", "Охранник", "Уборщик"};
-    private final String[] workplaces = {"Пятерочка", "Магнит", "Лента", "Озон", "Вайлдберриз"};
-    private final String[] bankNames = {"Сбербанк", "ВТБ", "Газпромбанк", "Альфа-Банк", "Тинькофф"};
-    private final String[] streetNames = {"Ленина", "Советская", "Мира", "Пушкина", "Гагарина"};
+    private final String[] bankNames = {"Сбербанк", "ВТБ", "Альфа-Банк", "Тинькофф", "Газпромбанк"};
+    private final String[] streetNames = {"Ленина", "Пушкина", "Гагарина", "Мира", "Советская"};
+    private final String[] lastNames = {"Иванов", "Петров", "Сидоров", "Кузнецов", "Смирнов"};
+    private final String[] firstNames = {"Алексей", "Дмитрий", "Иван", "Сергей", "Андрей"};
+    private final String[] middleNames = {"Алексеевич", "Дмитриевич", "Иванович", "Сергеевич", "Андреевич"};
+    private final String[] workplaces = {"ООО Ромашка", "ЗАО Лотос", "ИП Иванов", "АО Альфа", "ПАО Сбербанк"};
 
     public void initializeEntities() {
-        for (int i = 1; i <= 5; i++) {
+        for (int i = 1; i <= bankNames.length; i++) {
             Bank bank = generateBank(i);
             bankList.add(bank);
 
@@ -47,28 +45,39 @@ public class EntitiesInitializer {
                 BankOffice bankOffice = generateBankOffice(bank, j);
                 bankOfficeList.add(bankOffice);
 
-                for (int k = 1; k <= 5; k++) {
-                    Employee employee = generateEmployee(bank, bankOffice, k);
-                    employeeList.add(employee);
-                }
-
-                for (int l = 1; l <= 3; l++) {
-                    BankAtm bankAtm = generateBankAtm(bank, bankOffice, l);
+                for (int k = 1; k <= 2; k++) {
+                    BankAtm bankAtm = generateBankAtm(bank, bankOffice, k);
                     bankAtmList.add(bankAtm);
                 }
+            }
+
+            for (int l = 1; l <= 5; l++) {
+                Employee employee = generateEmployee(bank, bankOfficeList.get(random.nextInt(bankOfficeList.size())), l);
+                employeeList.add(employee);
             }
 
             for (int m = 1; m <= 5; m++) {
                 User user = generateUser(bank, m);
                 userList.add(user);
 
+                List<PaymentAccount> userPaymentAccounts = new ArrayList<>();
+                List<CreditAccount> userCreditAccounts = new ArrayList<>();
+
                 for (int n = 1; n <= 2; n++) {
                     PaymentAccount paymentAccount = generatePaymentAccount(user, bank, n);
                     paymentAccountList.add(paymentAccount);
+                    userPaymentAccounts.add(paymentAccount);
 
                     CreditAccount creditAccount = generateCreditAccount(user, employeeList.get(random.nextInt(employeeList.size())), paymentAccount, bank, n);
                     creditAccountList.add(creditAccount);
+                    userCreditAccounts.add(creditAccount);
                 }
+
+                user.setPaymentAccounts(userPaymentAccounts);
+                user.setCreditAccounts(userCreditAccounts);
+
+
+                user.setCreditRating(generateCreditRating(user.getMonthlyIncome()));
             }
         }
     }
@@ -83,7 +92,7 @@ public class EntitiesInitializer {
     private BankOffice generateBankOffice(Bank bank, int orderNumber) {
         return bankOfficeService.createBankOffice(
                 (long) orderNumber,
-                bank.getBankName() + " офис " + orderNumber,
+                bank.getBankName() + ", Офис " + orderNumber,
                 streetNames[orderNumber - 1] + ", " + orderNumber,
                 true,
                 true,
@@ -100,23 +109,24 @@ public class EntitiesInitializer {
     private BankAtm generateBankAtm(Bank bank, BankOffice bankOffice, int orderNumber) {
         return bankAtmService.createBankAtm(
                 random.nextLong(),
-                bank.getBankName() + " ATM " + orderNumber,
-                "Operational",
+                bank.getBankName() + ", Банкомат " + orderNumber,
+                "Работает",
                 bank,
                 bankOffice,
-                employeeList.get(random.nextInt(employeeList.size())),
+                employeeList.isEmpty() ? null : employeeList.get(random.nextInt(employeeList.size())),
                 true,
                 true,
                 (double) orderNumber * 1000,
                 (double) orderNumber * 100
         );
     }
+
     private Employee generateEmployee(Bank bank, BankOffice bankOffice, int orderNumber) {
         return employeeService.createEmployee(
                 (long) orderNumber,
                 getGeneratedFullName(),
                 getRandomBirthDate(),
-                jobTitles[random.nextInt(jobTitles.length)],
+                "Сотрудник",
                 bank,
                 true,
                 bankOffice,
@@ -131,6 +141,7 @@ public class EntitiesInitializer {
                 getGeneratedFullName(),
                 LocalDate.now(),
                 workplaces[random.nextInt(workplaces.length)],
+                (double) (random.nextInt(100000) + 30000),
                 List.of(bank)
         );
     }
@@ -139,7 +150,8 @@ public class EntitiesInitializer {
         return paymentAccountService.createPaymentAccount(
                 (long) orderNumber,
                 user,
-                bank
+                bank.getBankName(),
+                (double) (random.nextInt(100000) + 10000)
         );
     }
 
@@ -148,13 +160,14 @@ public class EntitiesInitializer {
                 (long) orderNumber,
                 user,
                 LocalDate.now(),
-                LocalDate.now(),
-                orderNumber * 2,
-                (double) orderNumber * 10,
-                (double) orderNumber * 5,
+                LocalDate.now().plusYears(1),
+                orderNumber * 12,
+                (double) orderNumber * 100000,
+                (double) orderNumber * 10000,
+                15.0,
                 employee,
                 paymentAccount,
-                bank
+                bank.getBankName()
         );
     }
 
@@ -167,5 +180,9 @@ public class EntitiesInitializer {
     private LocalDate getRandomBirthDate() {
         int age = 20 + random.nextInt(15);
         return LocalDate.now().minus(Period.ofYears(age));
+    }
+
+    private Integer generateCreditRating(Double monthlyIncome) {
+        return (int) (monthlyIncome / 1000) * 100;
     }
 }

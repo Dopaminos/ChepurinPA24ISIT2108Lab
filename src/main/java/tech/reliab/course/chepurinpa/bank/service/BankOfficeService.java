@@ -20,7 +20,7 @@ public interface BankOfficeService {
 
     BankOffice getBankOfficeById(Long officeId);
 
-    void updateBankOfficeById(Long officeId);
+    void updateBankOfficeById(Long officeId, BankOffice bankOffice);
 
     void deleteBankOfficeById(Long officeId);
 }

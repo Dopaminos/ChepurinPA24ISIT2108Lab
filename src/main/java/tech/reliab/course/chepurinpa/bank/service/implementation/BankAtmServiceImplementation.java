@@ -6,7 +6,12 @@ import tech.reliab.course.chepurinpa.bank.entity.BankOffice;
 import tech.reliab.course.chepurinpa.bank.entity.Employee;
 import tech.reliab.course.chepurinpa.bank.service.BankAtmService;
 
+import java.util.HashMap;
+import java.util.Map;
+
 public class BankAtmServiceImplementation implements BankAtmService {
+
+    private final Map<Long, BankAtm> bankAtmMap = new HashMap<>();
 
     @Override
     public BankAtm createBankAtm(Long atmId,
@@ -32,24 +37,30 @@ public class BankAtmServiceImplementation implements BankAtmService {
                 .atmFunds(atmFunds)
                 .maintenanceCost(maintenanceCost)
                 .build();
-        bank.setAtmCount(bank.getAtmCount() + 1);
-        bankOffice.setAtmCount(bankOffice.getAtmCount() + 1);
-        if (bank.getTotalFunds() < atmFunds) {
-            throw new IllegalArgumentException("В банке недостаточно средств для банкомата");
-        } else {
-            bankAtm.setAtmFunds(atmFunds);
-        }
+        bankAtmMap.put(atmId, bankAtm);
         return bankAtm;
     }
 
     @Override
     public BankAtm getBankAtmById(Long atmId) {
-        return null;
+        return bankAtmMap.get(atmId);
     }
 
     @Override
-    public void updateBankAtmById(Long atmId, BankAtm bankAtm) {}
+    public void updateBankAtmById(Long atmId, BankAtm bankAtm) {
+        if (bankAtmMap.containsKey(atmId)) {
+            bankAtmMap.put(atmId, bankAtm);
+        } else {
+            throw new IllegalArgumentException("Банкомат с ID " + atmId + " не существует.");
+        }
+    }
 
     @Override
-    public void deleteBankAtmById(Long atmId, BankAtm bankAtm) {}
+    public void deleteBankAtmById(Long atmId) {
+        if (bankAtmMap.containsKey(atmId)) {
+            bankAtmMap.remove(atmId);
+        } else {
+            throw new IllegalArgumentException("Банкомат с ID " + atmId + " не существует.");
+        }
+    }
 }

@@ -11,10 +11,11 @@ public class BankServiceImplementation implements BankService {
     private final Map<Long, Bank> bankMap = new HashMap<>();
 
     @Override
-    public Bank createBank(Long bankId, String bankName) {
+    public Bank createBank(Long bankId, String bankName, Integer bankRating) {
         Bank bank = Bank.builder()
                 .bankId(bankId)
                 .bankName(bankName)
+                .bankRating(bankRating) // Initialize bankRating
                 .build();
         bankMap.put(bankId, bank);
         return bank;

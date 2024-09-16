@@ -2,6 +2,7 @@ package tech.reliab.course.chepurinpa.bank.service.implementation;
 
 import tech.reliab.course.chepurinpa.bank.entity.PaymentAccount;
 import tech.reliab.course.chepurinpa.bank.entity.User;
+import tech.reliab.course.chepurinpa.bank.entity.Bank;
 import tech.reliab.course.chepurinpa.bank.service.PaymentAccountService;
 
 import java.util.HashMap;
@@ -15,12 +16,13 @@ public class PaymentAccountServiceImplementation implements PaymentAccountServic
     public PaymentAccount createPaymentAccount(Long paymentAccountId,
                                                User accountHolder,
                                                String bankName,
-                                               Double balance) {
+                                               Double balance, Bank bank) {
         PaymentAccount paymentAccount = PaymentAccount.builder()
                 .paymentAccountId(paymentAccountId)
                 .accountHolder(accountHolder)
                 .bankName(bankName)
                 .balance(balance)
+                .bank(bank)
                 .build();
         paymentAccountMap.put(paymentAccountId, paymentAccount);
         return paymentAccount;

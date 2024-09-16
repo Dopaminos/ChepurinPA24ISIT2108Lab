@@ -4,6 +4,8 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.util.List;
+
 @Getter
 @Setter
 @Builder
@@ -21,6 +23,7 @@ public class BankOffice {
     private Double officeFunds;
     private Double rentalCost;
     private Bank bank;
+    private List<BankAtm> atms;
 
     @Override
     public String toString() {

@@ -13,7 +13,7 @@ public class PaymentAccount {
     private User accountHolder;
     private String bankName;
     private Double balance;
-
+    private Bank bank;
     @Override
     public String toString() {
         return "PaymentAccount {" +

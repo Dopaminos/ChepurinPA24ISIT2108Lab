@@ -7,7 +7,9 @@ import tech.reliab.course.chepurinpa.bank.service.implementation.*;
 import java.time.LocalDate;
 import java.time.Period;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
+import java.util.Optional;
 import java.util.Random;
 
 public class EntitiesInitializer {
@@ -41,20 +43,29 @@ public class EntitiesInitializer {
             Bank bank = generateBank(i);
             bankList.add(bank);
 
+            List<BankOffice> bankOffices = new ArrayList<>();
             for (int j = 1; j <= 3; j++) {
                 BankOffice bankOffice = generateBankOffice(bank, j);
                 bankOfficeList.add(bankOffice);
+                bankOffices.add(bankOffice);
 
+                List<BankAtm> officeAtms = new ArrayList<>();
                 for (int k = 1; k <= 2; k++) {
                     BankAtm bankAtm = generateBankAtm(bank, bankOffice, k);
                     bankAtmList.add(bankAtm);
+                    officeAtms.add(bankAtm);
                 }
+                bankOffice.setAtms(officeAtms);
             }
+            bank.setOffices(bankOffices);
 
+            List<Employee> bankEmployees = new ArrayList<>();
             for (int l = 1; l <= 5; l++) {
-                Employee employee = generateEmployee(bank, bankOfficeList.get(random.nextInt(bankOfficeList.size())), l);
+                Employee employee = generateEmployee(bank, bankOffices.get(random.nextInt(bankOffices.size())), l);
                 employeeList.add(employee);
+                bankEmployees.add(employee);
             }
+            bank.setEmployees(bankEmployees);
 
             for (int m = 1; m <= 5; m++) {
                 User user = generateUser(bank, m);
@@ -68,7 +79,11 @@ public class EntitiesInitializer {
                     paymentAccountList.add(paymentAccount);
                     userPaymentAccounts.add(paymentAccount);
 
-                    CreditAccount creditAccount = generateCreditAccount(user, employeeList.get(random.nextInt(employeeList.size())), paymentAccount, bank, n);
+                    CreditAccount creditAccount = generateCreditAccount(user,
+                            employeeList.get(random.nextInt(employeeList.size())),
+                            paymentAccount,
+                            bank,
+                            n);
                     creditAccountList.add(creditAccount);
                     userCreditAccounts.add(creditAccount);
                 }
@@ -76,7 +91,7 @@ public class EntitiesInitializer {
                 user.setPaymentAccounts(userPaymentAccounts);
                 user.setCreditAccounts(userCreditAccounts);
 
-
+                // Установка кредитного рейтинга
                 user.setCreditRating(generateCreditRating(user.getMonthlyIncome()));
             }
         }
@@ -85,7 +100,8 @@ public class EntitiesInitializer {
     private Bank generateBank(int orderNumber) {
         return bankService.createBank(
                 (long) orderNumber,
-                bankNames[orderNumber - 1]
+                bankNames[orderNumber - 1],
+                random.nextInt(100)
         );
     }
 
@@ -146,16 +162,21 @@ public class EntitiesInitializer {
         );
     }
 
-    private PaymentAccount generatePaymentAccount(User user, Bank bank, int orderNumber) {
+    public PaymentAccount generatePaymentAccount(User user, Bank bank, int orderNumber) {
         return paymentAccountService.createPaymentAccount(
                 (long) orderNumber,
                 user,
                 bank.getBankName(),
-                (double) (random.nextInt(100000) + 10000)
+                (double) (random.nextInt(100000) + 10000),
+                bank
         );
     }
 
-    private CreditAccount generateCreditAccount(User user, Employee employee, PaymentAccount paymentAccount, Bank bank, int orderNumber) {
+    public CreditAccount generateCreditAccount(User user,
+                                               Employee employee,
+                                               PaymentAccount paymentAccount,
+                                               Bank bank,
+                                               int orderNumber) {
         return creditAccountService.createCreditAccount(
                 (long) orderNumber,
                 user,
@@ -184,5 +205,58 @@ public class EntitiesInitializer {
 
     private Integer generateCreditRating(Double monthlyIncome) {
         return (int) (monthlyIncome / 1000) * 100;
+    }
+
+    public Optional<Bank> findBestBank() {
+        System.out.println("Поиск лучшего банка...");
+        return bankList.stream()
+                .filter(bank -> {
+                    if (bank.getAtms() == null || bank.getEmployees() == null || bank.getOffices() == null) {
+                        System.out.println("Ошибка: один из параметров банка равен null");
+                        return false;
+                    }
+                    return true;
+                })
+                .min(Comparator.comparingInt((Bank b) -> b.getAtms().size())
+                        .thenComparingInt(b -> b.getEmployees().size())
+                        .thenComparingInt(b -> b.getOffices().size())
+                        .thenComparingDouble(b -> b.getInterestRate() != null ? b.getInterestRate() : Double.MAX_VALUE));
+    }
+
+    public Optional<BankOffice> findSuitableOffice(Bank bank, double requestedAmount) {
+        System.out.println("Поиск подходящего офиса...");
+        return bank.getOffices().stream()
+                .filter(office -> {
+                    System.out.println("Проверка офиса: " + office.getOfficeName());
+                    System.out.println("Офис работает: " + office.getIsOperational());
+                    System.out.println("Офис может выдавать кредиты: " + office.getCanIssueLoans());
+                    System.out.println("Средства офиса: " + office.getOfficeFunds());
+                    System.out.println("Запрашиваемая сумма: " + requestedAmount);
+                    return office.getIsOperational() &&
+                            office.getCanIssueLoans() &&
+                            office.getOfficeFunds() >= requestedAmount;
+                })
+                .findFirst();
+    }
+
+    public Optional<Employee> findSuitableEmployee(BankOffice office) {
+        System.out.println("Поиск подходящего сотрудника...");
+        return office.getBank().getEmployees().stream()
+                .filter(employee -> {
+                    System.out.println("Проверка сотрудника: " + employee.getFullName());
+                    System.out.println("Может выдавать кредиты: " + employee.getCanIssueLoans());
+                    return employee.getCanIssueLoans();
+                })
+                .findFirst();
+    }
+
+    public Optional<BankAtm> findSuitableAtm(BankOffice office, double requestedAmount) {
+        System.out.println("Поиск подходящего банкомата...");
+        return office.getAtms().stream()
+                .filter(atm -> {
+                    System.out.println("Проверка банкомата: " + atm.getAtmId());
+                    return atm.getAtmFunds() >= requestedAmount;
+                })
+                .findFirst();
     }
 }
